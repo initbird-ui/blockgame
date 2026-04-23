@@ -686,33 +686,32 @@ export default function BlockGame() {
             </p>
 
             {gameState === 'WIN' && (
-              <div className="mb-8 flex flex-col gap-4">
-                {/* My Record Card */}
-                <div className="bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border border-cyan-500/30 rounded-2xl p-5 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-2xl rounded-full translate-x-10 -translate-y-10"></div>
-                  <h3 className="text-xs text-cyan-300 uppercase tracking-widest font-bold mb-1 text-left relative z-10">내 기록 (My Record)</h3>
-                  <div className="flex justify-between items-end relative z-10">
-                    <span className="font-bold text-white text-lg">{playerName || "Anonymous"}</span>
-                    <span className="text-4xl font-mono text-cyan-400 font-black drop-shadow-[0_0_10px_rgba(0,242,255,0.8)]">{formatTime(seconds)}</span>
+              <div className="mb-8">
+                <div className="bg-white/5 rounded-2xl p-6 mb-6 border border-white/10">
+                  <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-2">My Record</div>
+                  <div className="text-4xl font-mono text-cyan-400 mb-2 drop-shadow-[0_0_15px_rgba(0,242,255,0.5)]">
+                    {formatTime(seconds)}
+                  </div>
+                  <div className="text-sm font-bold text-yellow-400">
+                    {leaderboard.findIndex(e => e.name === playerName && e.finishtime === seconds) !== -1 
+                      ? `현재 ${leaderboard.findIndex(e => e.name === playerName && e.finishtime === seconds) + 1}위 달성! 🏆` 
+                      : '아쉽게도 Top 3 진입 실패 😢'}
                   </div>
                 </div>
 
-                {/* Leaderboard Card */}
-                <div className="text-left bg-black/40 rounded-2xl p-6 border border-white/10">
-                  <h3 className="text-xs text-zinc-400 uppercase tracking-widest font-bold mb-4">🏆 전체 순위 (Top 3)</h3>
+                <div className="text-left bg-black/30 rounded-2xl p-6 border border-white/5">
+                  <h3 className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-4">Top 3 Records</h3>
                   <div className="space-y-3">
                     {leaderboard.length > 0 ? (
                       leaderboard.map((entry, idx) => {
-                        const isMe = entry.name === (playerName || "Anonymous") && entry.finishtime === seconds;
+                        const isMe = entry.name === playerName && entry.finishtime === seconds;
                         return (
-                          <div key={idx} className={`flex justify-between items-center p-2 rounded-lg transition-colors ${isMe ? 'bg-cyan-500/20 border border-cyan-500/30' : ''}`}>
+                          <div key={idx} className={`flex justify-between items-center p-2 rounded-lg ${isMe ? 'bg-cyan-500/20 border border-cyan-500/50' : ''}`}>
                             <span className="flex items-center gap-3">
-                              <span className={`font-mono font-bold ${isMe ? 'text-cyan-400' : 'text-zinc-600'}`}>
-                                {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `0${idx + 1}`}
-                              </span>
-                              <span className={`font-bold ${isMe ? 'text-white' : 'text-zinc-300'}`}>{entry.name}</span>
+                              <span className={`font-mono ${isMe ? 'text-cyan-400' : 'text-zinc-600'}`}>0{idx + 1}</span>
+                              <span className={`font-bold ${isMe ? 'text-cyan-400' : 'text-white'}`}>{entry.name}</span>
                             </span>
-                            <span className={`font-mono ${isMe ? 'text-cyan-300 font-bold' : 'text-zinc-400'}`}>{formatTime(entry.finishtime)}</span>
+                            <span className={`font-mono ${isMe ? 'text-cyan-400' : 'text-zinc-400'}`}>{formatTime(entry.finishtime)}</span>
                           </div>
                         );
                       })
