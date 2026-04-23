@@ -28,7 +28,7 @@ export default function BlockGame() {
   const [lives, setLives] = useState(3);
   const [seconds, setSeconds] = useState(0);
   const [countdown, setCountdown] = useState(3);
-  const [leaderboard, setLeaderboard] = useState<{ name: string; time: number }[]>([]);
+  const [leaderboard, setLeaderboard] = useState<{ name: string; finishtime: number; timestamp: string }[]>([]);
   const [isPaused, setIsPaused] = useState(false);
 
   const audioCtx = useRef<AudioContext | null>(null);
