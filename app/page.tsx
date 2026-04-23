@@ -599,9 +599,9 @@ export default function BlockGame() {
 
       {/* Game Screen */}
       {(gameState === 'PLAYING' || gameState === 'COUNTDOWN' || gameState === 'WIN' || gameState === 'GAMEOVER') && (
-        <div className="relative flex flex-col items-center gap-6 animate-in fade-in duration-700">
+        <div className="relative flex flex-col items-center gap-4 sm:gap-6 w-full max-w-[800px] px-4 sm:px-0 animate-in fade-in duration-700">
           {/* UI Header */}
-          <div className="w-[800px] flex justify-between items-center px-6 py-4 backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl">
+          <div className="w-full flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4 backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl">
             <div className="flex gap-8">
               <div className="flex flex-col">
                 <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">LIVES</span>
@@ -644,8 +644,8 @@ export default function BlockGame() {
           </div>
 
           {/* Canvas Area */}
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50">
-            <canvas ref={canvasRef} width={800} height={550} className="block" />
+          <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50">
+            <canvas ref={canvasRef} width={800} height={550} className="block w-full h-auto" />
 
             {isPaused && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
