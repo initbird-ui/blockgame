@@ -495,11 +495,46 @@ export default function BlockGame() {
       if (e.key === 'ArrowRight' || e.key === 'Right') gameVars.current.keys.right = false;
       if (e.key === 'ArrowLeft' || e.key === 'Left') gameVars.current.keys.left = false;
     };
+    const handleTouch = (e: TouchEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas || gameVars.current.isPaused) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches[0];
+      const relativeX = touch.clientX - rect.left;
+      
+      // Scale touch position to internal coordinates (800 width)
+      const scaleX = canvas.width / rect.width;
+      const x = relativeX * scaleX;
+      
+      // Update paddle position (center on touch)
+      const paddleWidth = gameVars.current.paddle.width;
+      let newX = x - paddleWidth / 2;
+      
+      if (newX < 0) newX = 0;
+      if (newX > canvas.width - paddleWidth) newX = canvas.width - paddleWidth;
+      
+      gameVars.current.paddle.x = newX;
+      
+      if (e.cancelable) e.preventDefault();
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.addEventListener('touchstart', handleTouch, { passive: false });
+      canvas.addEventListener('touchmove', handleTouch, { passive: false });
+    }
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      if (canvas) {
+        canvas.removeEventListener('touchstart', handleTouch);
+        canvas.removeEventListener('touchmove', handleTouch);
+      }
     };
   }, []);
 
