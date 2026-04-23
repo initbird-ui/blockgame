@@ -74,47 +74,77 @@ export default function BlockGame() {
     
     const now = audioCtx.current.currentTime;
     
-    // Boom sound (Low thud)
-    const osc = audioCtx.current.createOscillator();
-    const gain = audioCtx.current.createGain();
-    osc.type = 'square'; // More aggressive sound
-    osc.frequency.setValueAtTime(150, now);
-    osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5); // Fixed value drop
-    
-    gain.gain.setValueAtTime(1.0, now); // Increased volume
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-    
-    osc.connect(gain);
-    gain.connect(audioCtx.current.destination);
-    osc.start(now);
-    osc.stop(now + 0.5);
-
-    // Crackle (Noise)
-    for (let i = 0; i < 8; i++) {
-      const t = now + 0.1 + Math.random() * 0.4;
-      const noiseGain = audioCtx.current.createGain();
-      const bufferSize = Math.floor(audioCtx.current.sampleRate * 0.08); // Ensure integer
-      if (bufferSize <= 0) continue;
+    // 1. Victory Fanfare (C Major Arpeggio: C4, E4, G4, C5)
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    notes.forEach((freq, index) => {
+      const noteOsc = audioCtx.current!.createOscillator();
+      const noteGain = audioCtx.current!.createGain();
       
+      // Use 'sine' for a bright, clean game-like tone
+      noteOsc.type = 'sine';
+      noteOsc.frequency.setValueAtTime(freq, now + index * 0.12);
+      
+      const startTime = now + index * 0.12;
+      // Last note is held longer
+      const duration = index === notes.length - 1 ? 1.5 : 0.15;
+      
+      noteGain.gain.setValueAtTime(0, startTime);
+      noteGain.gain.linearRampToValueAtTime(0.4, startTime + 0.02);
+      noteGain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      noteOsc.connect(noteGain);
+      noteGain.connect(audioCtx.current!.destination);
+      
+      noteOsc.start(startTime);
+      noteOsc.stop(startTime + duration);
+    });
+
+    // 2. Bright Firework Explosion (Starts with the last note)
+    const explosionTime = now + (notes.length - 1) * 0.12;
+    
+    // High pitched whistle/shimmer
+    const popOsc = audioCtx.current.createOscillator();
+    const popGain = audioCtx.current.createGain();
+    popOsc.type = 'sine';
+    popOsc.frequency.setValueAtTime(1200, explosionTime);
+    popOsc.frequency.exponentialRampToValueAtTime(100, explosionTime + 0.6);
+    
+    popGain.gain.setValueAtTime(0, explosionTime);
+    popGain.gain.linearRampToValueAtTime(0.5, explosionTime + 0.05);
+    popGain.gain.exponentialRampToValueAtTime(0.01, explosionTime + 0.6);
+    
+    popOsc.connect(popGain);
+    popGain.connect(audioCtx.current.destination);
+    popOsc.start(explosionTime);
+    popOsc.stop(explosionTime + 0.6);
+
+    // Crackle (Noise burst)
+    const bufferSize = Math.floor(audioCtx.current.sampleRate * 0.5); 
+    if (bufferSize > 0) {
       const buffer = audioCtx.current.createBuffer(1, bufferSize, audioCtx.current.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let j = 0; j < bufferSize; j++) data[j] = Math.random() * 2 - 1;
+      for (let j = 0; j < bufferSize; j++) {
+        // Create white noise
+        data[j] = Math.random() * 2 - 1;
+      }
       
-      const source = audioCtx.current.createBufferSource();
-      source.buffer = buffer;
+      const noiseSource = audioCtx.current.createBufferSource();
+      noiseSource.buffer = buffer;
       
-      // Use a filter for more firework-like crackle
       const filter = audioCtx.current.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.value = 1000;
+      filter.type = 'bandpass';
+      filter.frequency.value = 3000;
       
-      noiseGain.gain.setValueAtTime(0.5, t); // Increased volume
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+      const noiseGain = audioCtx.current.createGain();
+      noiseGain.gain.setValueAtTime(0, explosionTime);
+      noiseGain.gain.linearRampToValueAtTime(0.3, explosionTime + 0.05);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, explosionTime + 0.5);
       
-      source.connect(filter);
+      noiseSource.connect(filter);
       filter.connect(noiseGain);
       noiseGain.connect(audioCtx.current.destination);
-      source.start(t);
+      
+      noiseSource.start(explosionTime);
     }
   };
   const gameVars = useRef({
